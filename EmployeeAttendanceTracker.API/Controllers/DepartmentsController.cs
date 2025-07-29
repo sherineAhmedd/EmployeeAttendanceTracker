@@ -46,7 +46,7 @@ namespace EmployeeAttendanceTracker.API.Controllers
             return View(new CreateDepartmentDto());
         }
 
-        // POST: Departments/Create
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateDepartmentDto dto)
