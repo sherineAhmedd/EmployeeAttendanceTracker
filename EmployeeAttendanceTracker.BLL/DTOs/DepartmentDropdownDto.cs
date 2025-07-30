@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace EmployeeAttendanceTracker.BLL.DTOs
 {
-     public  class DepartmentDropdownDto
+    public class DepartmentDropdownDto
     {
         public int DepartmentId { get; set; }
-        public string DepartmentName { get; set; }
+        public string? DepartmentName { get; set; }
     }
 }

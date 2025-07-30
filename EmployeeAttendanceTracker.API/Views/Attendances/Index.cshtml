@@ -1,0 +1,352 @@
+﻿@model IEnumerable<EmployeeAttendanceTracker.BLL.DTOs.CreateAttendanceDto>
+
+@{
+    ViewData["Title"] = "Attendance Management";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <h4>Attendance Records</h4>
+            <p>
+                <a asp-action="Create" class="btn btn-primary">Create New Attendance</a>
+            </p>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Quick Attendance Entry</h5>
+                </div>
+                <div class="card-body">
+                    <form id="quickAttendanceForm">
+                        @Html.AntiForgeryToken()
+                        <div class="form-group">
+                            <label for="quickEmployee">Employee:</label>
+                            <select id="quickEmployee" class="form-control" required>
+                                <option value="">Select Employee</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="attendanceDate">Date:</label>
+                            <input type="date" id="attendanceDate" class="form-control" required max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                            <small class="form-text text-muted">Cannot mark attendance for future dates</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Current Status:</label>
+                            <div id="currentStatus" class="alert alert-info">Select employee and date to see current status</div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <!-- Filter Section -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5>Filter Attendance</h5>
+                </div>
+                <div class="card-body">
+                    <form id="filterForm" method="get">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="departmentFilter">Department:</label>
+                                <select id="departmentFilter" name="deptId" class="form-control">
+                                    <option value="">All Departments</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="employeeFilter">Employee:</label>
+                                <select id="employeeFilter" name="empId" class="form-control">
+                                    <option value="">All Employees</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="fromDate">From Date:</label>
+                                <input type="date" id="fromDate" name="from" class="form-control" />
+                            </div>
+                            <div class="col-md-3">
+                                <label for="toDate">To Date:</label>
+                                <input type="date" id="toDate" name="to" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                
+                                <button type="button" id="clearFilter" class="btn btn-outline-secondary">Clear Filter</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <table class="table" id="attendanceTable">
+                <thead>
+                    <tr>
+                        <th>Employee Name</th>
+                        <th>Department</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model) {
+                        <tr data-attendance-id="@item.AttendanceId">
+                            <td>@Html.DisplayFor(modelItem => item.EmployeeName)</td>
+                            <td>@Html.DisplayFor(modelItem => item.DepartmentName)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Date)</td>
+                            <td>
+                                <select class="form-control status-dropdown" data-attendance-id="@item.AttendanceId">
+                                    @if (item.Status.ToString() == "Present")
+                                    {
+                                        <option value="Present" selected>Present</option>
+                                        <option value="Absent">Absent</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="Present">Present</option>
+                                        <option value="Absent" selected>Absent</option>
+                                    }
+                                </select>
+                            </td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@item.AttendanceId" class="btn btn-sm btn-warning">Edit</a>
+                                <a asp-action="Details" asp-route-id="@item.AttendanceId" class="btn btn-sm btn-info">Details</a>
+                                <a asp-action="Delete" asp-route-id="@item.AttendanceId" class="btn btn-sm btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            
+            <!-- Pagination -->
+            @if (ViewBag.TotalPages > 1)
+            {
+                <nav aria-label="Attendance pagination">
+                    <ul class="pagination justify-content-center">
+                        @if (ViewBag.HasPreviousPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="?page=@(ViewBag.CurrentPage - 1)&deptId=@Context.Request.Query["deptId"]&empId=@Context.Request.Query["empId"]&from=@Context.Request.Query["from"]&to=@Context.Request.Query["to"]">Previous</a>
+                            </li>
+                        }
+                        
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="?page=@i&deptId=@Context.Request.Query["deptId"]&empId=@Context.Request.Query["empId"]&from=@Context.Request.Query["from"]&to=@Context.Request.Query["to"]">@i</a>
+                            </li>
+                        }
+                        
+                        @if (ViewBag.HasNextPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="?page=@(ViewBag.CurrentPage + 1)&deptId=@Context.Request.Query["deptId"]&empId=@Context.Request.Query["empId"]&from=@Context.Request.Query["from"]&to=@Context.Request.Query["to"]">Next</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+                
+                <div class="text-center">
+                    <small class="text-muted">
+                        Showing @(((ViewBag.CurrentPage - 1) * ViewBag.PageSize) + 1) to @(Math.Min(ViewBag.CurrentPage * ViewBag.PageSize, ViewBag.TotalItems)) of @ViewBag.TotalItems attendance records
+                    </small>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Load dropdowns when page loads
+            loadDepartments();
+            loadEmployees();
+            
+            // Quick attendance form events
+            $('#quickEmployee, #attendanceDate').change(function() {
+                checkCurrentStatus();
+            });
+            
+            // Clear filter
+            $('#clearFilter').click(function() {
+                $('#filterForm')[0].reset();
+                $('#filterForm').submit();
+            });
+            
+            // Live filtering
+            $('#departmentFilter, #employeeFilter, #fromDate, #toDate').change(function() {
+                applyLiveFilter();
+            });
+
+            // Inline status editing
+            $('#attendanceTable').on('change', '.status-dropdown', function() {
+                var attendanceId = $(this).data('attendance-id');
+                var newStatus = $(this).val();
+
+                $.ajax({
+                    url: '/Attendances/UpdateStatusAjax',
+                    type: 'POST',
+                    data: {
+                        attendanceId: attendanceId,
+                        status: newStatus
+                    },
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function(result) {
+                        if (result.success) {
+                            // Update the status display immediately
+                            $('#currentStatus').removeClass('alert-info alert-warning').addClass('alert-success')
+                                .text('Current Status: ' + newStatus);
+                        } else {
+                            console.error('Error updating status: ' + result.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error updating status:', error);
+                    }
+                });
+            });
+        });
+        
+        function loadDepartments() {
+            $.get('/Departments/GetForDropdown')
+                .done(function(data) {
+                    var deptFilter = $('#departmentFilter');
+                    
+                    data.forEach(function(dept) {
+                        deptFilter.append($('<option>', {
+                            value: dept.departmentId,
+                            text: dept.departmentName
+                        }));
+                    });
+                })
+                .fail(function(xhr, status, error) {
+                    console.error('Error loading departments:', error);
+                });
+        }
+        
+        function loadEmployees() {
+            $.get('/Employees/GetForDropdown')
+                .done(function(data) {
+                    var empFilter = $('#employeeFilter');
+                    var quickEmp = $('#quickEmployee');
+                    
+                    data.forEach(function(emp) {
+                        empFilter.append($('<option>', {
+                            value: emp.employeeId,
+                            text: emp.fullName
+                        }));
+                        
+                        quickEmp.append($('<option>', {
+                            value: emp.employeeId,
+                            text: emp.fullName
+                        }));
+                    });
+                })
+                .fail(function(xhr, status, error) {
+                    console.error('Error loading employees:', error);
+                });
+        }
+        
+        function checkCurrentStatus() {
+            var employeeId = $('#quickEmployee').val();
+            var date = $('#attendanceDate').val();
+            
+            if (employeeId && date) {
+                $.get('/Attendances/GetStatus', { employeeId: employeeId, date: date })
+                    .done(function(data) {
+                        if (data.status) {
+                            $('#currentStatus').removeClass('alert-info alert-warning').addClass('alert-success')
+                                .text('Current Status: ' + data.status);
+                        } else {
+                            $('#currentStatus').removeClass('alert-info alert-success').addClass('alert-warning')
+                                .text('No attendance marked for this date');
+                        }
+                    })
+                    .fail(function(xhr, status, error) {
+                        console.error('Error checking status:', error);
+                        $('#currentStatus').removeClass('alert-info alert-success').addClass('alert-warning')
+                            .text('Error checking status');
+                    });
+            } else {
+                $('#currentStatus').removeClass('alert-info alert-success alert-warning').addClass('alert-info')
+                    .text('Please select both employee and date');
+            }
+        }
+        
+        function updateAttendanceTable() {
+            // Get current filter values
+            var deptId = $('#departmentFilter').val();
+            var empId = $('#employeeFilter').val();
+            var fromDate = $('#fromDate').val();
+            var toDate = $('#toDate').val();
+            
+            // Build query string
+            var queryString = '?';
+            if (deptId) queryString += 'deptId=' + deptId + '&';
+            if (empId) queryString += 'empId=' + empId + '&';
+            if (fromDate) queryString += 'from=' + fromDate + '&';
+            if (toDate) queryString += 'to=' + toDate + '&';
+            
+            // Remove trailing '&' if exists
+            if (queryString.endsWith('&')) {
+                queryString = queryString.slice(0, -1);
+            }
+            
+            // Load updated attendance data
+            $.get('/Attendances/Index' + queryString)
+                .done(function(data) {
+                    // Extract the table body from the response
+                    var tableBody = $(data).find('tbody').html();
+                    $('#attendanceTable tbody').html(tableBody);
+                })
+                .fail(function(xhr, status, error) {
+                    console.error('Error updating table:', error);
+                });
+        }
+
+        function applyLiveFilter() {
+            var deptId = $('#departmentFilter').val();
+            var empId = $('#employeeFilter').val();
+            var fromDate = $('#fromDate').val();
+            var toDate = $('#toDate').val();
+            
+            console.log('Applying filter:', { deptId, empId, fromDate, toDate });
+            
+            // Build query string
+            var queryString = '?';
+            if (deptId) queryString += 'deptId=' + deptId + '&';
+            if (empId) queryString += 'empId=' + empId + '&';
+            if (fromDate) queryString += 'from=' + fromDate + '&';
+            if (toDate) queryString += 'to=' + toDate + '&';
+            
+            // Remove trailing '&' if exists
+            if (queryString.endsWith('&')) {
+                queryString = queryString.slice(0, -1);
+            }
+            
+            console.log('Query string:', queryString);
+            
+            // Load filtered data
+            $.get('/Attendances/Index' + queryString)
+                .done(function(data) {
+                    console.log('Filter response received');
+                    var tableBody = $(data).find('tbody').html();
+                    $('#attendanceTable tbody').html(tableBody);
+                })
+                .fail(function(xhr, status, error) {
+                    console.error('Error applying filter:', error);
+                    console.error('Response:', xhr.responseText);
+                });
+        }
+    </script>
+}

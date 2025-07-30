@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using EmployeeAttendanceTracker.BLL.DTOs;
+using EmployeeAttendanceTracker.BLL.ServiceInterfaces;
+using EmployeeAttendanceTracker.BLL.Services;
+using EmployeeAttendanceTracker.DAL.Context;
+using EmployeeAttendanceTracker.DAL.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using EmployeeAttendanceTracker.DAL.Context;
-using EmployeeAttendanceTracker.DAL.Data.Entities;
-using EmployeeAttendanceTracker.BLL.ServiceInterfaces;
-using EmployeeAttendanceTracker.BLL.Services;
-using EmployeeAttendanceTracker.BLL.DTOs;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EmployeeAttendanceTracker.API.Controllers
 {
@@ -30,15 +31,12 @@ namespace EmployeeAttendanceTracker.API.Controllers
         }
 
         // GET: Departments/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null) return NotFound();
-
-            var department = await _departmentService.GetDepartmentByIdAsync(id.Value);
-            if (department == null) return NotFound();
-
-            return View(department);
+            var department = await _departmentService.GetDepartmentByIdAsync(id);
+            return department == null ? View("NotFound") : View(department);
         }
+
 
         // GET: Departments/Create
         public IActionResult Create()
@@ -46,24 +44,25 @@ namespace EmployeeAttendanceTracker.API.Controllers
             return View(new CreateDepartmentDto());
         }
 
-       
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateDepartmentDto dto)
         {
-            if (ModelState.IsValid)
-            {
-                var department = new Department
-                {
-                    DepartmentName = dto.DepartmentName,
-                    DepartmentCode = dto.DepartmentCode,
-                    Location = dto.Location
-                };
+            if (!ModelState.IsValid)
+                return View(dto);
 
-                await _departmentService.AddDepartmentAsync(department);
+            try
+            {
+                // Pass the DTO directly; the service handles mapping, validation, and saving
+                await _departmentService.AddDepartmentAsync(dto);
                 return RedirectToAction(nameof(Index));
             }
-            return View(dto);
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(dto);
+            }
         }
 
         // GET: Departments/Edit/5
@@ -71,19 +70,12 @@ namespace EmployeeAttendanceTracker.API.Controllers
         {
             if (id == null) return NotFound();
 
-            var department = await _departmentService.GetDepartmentByIdAsync(id.Value);
-            if (department == null) return NotFound();
-
-            var dto = new DepartmentDto
-            {
-                DepartmentId = department.DepartmentId,
-                DepartmentName = department.DepartmentName,
-                DepartmentCode = department.DepartmentCode,
-                Location = department.Location
-            };
+            var dto = await _departmentService.GetDepartmentDtoByIdAsync(id.Value);
+            if (dto == null) return NotFound();
 
             return View(dto);
         }
+
 
 
         // POST: Departments/Edit/5
@@ -94,35 +86,26 @@ namespace EmployeeAttendanceTracker.API.Controllers
             if (id != dto.DepartmentId)
                 return NotFound();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return View(dto);
+
+            try
             {
-                var existingDepartment = await _departmentService.GetDepartmentByIdAsync(id);
-                if (existingDepartment == null)
-                    return NotFound();
-
-                // Update only the properties you allow to change
-                existingDepartment.DepartmentName = dto.DepartmentName;
-                existingDepartment.DepartmentCode = dto.DepartmentCode;
-                existingDepartment.Location = dto.Location;
-
-                try
-                {
-                    await _departmentService.UpdateDepartmentAsync(existingDepartment);
-                }
-                catch (Exception)
-                {
-                    // Optionally check again to see if the record was deleted
-                    if (await _departmentService.GetDepartmentByIdAsync(dto.DepartmentId) == null)
-                        return NotFound();
-
-                    throw;
-                }
-
+                await _departmentService.UpdateDepartmentAsync(dto);
                 return RedirectToAction(nameof(Index));
+            }
+            catch (ValidationException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, "An error occurred: " + ex.Message);
             }
 
             return View(dto);
         }
+
 
 
         // GET: Departments/Delete/5
@@ -143,6 +126,18 @@ namespace EmployeeAttendanceTracker.API.Controllers
         {
             await _departmentService.DeleteDepartmentAsync(id);
             return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Departments/GetForDropdown
+        [HttpGet]
+        public async Task<IActionResult> GetForDropdown()
+        {
+            var departments = await _departmentService.GetAllDepartmentsAsync();
+            var dropdownData = departments.Select(d => new { 
+                departmentId = d.DepartmentId, 
+                departmentName = d.DepartmentName 
+            });
+            return Json(dropdownData);
         }
     }
 

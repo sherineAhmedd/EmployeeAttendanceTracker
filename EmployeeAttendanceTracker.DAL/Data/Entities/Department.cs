@@ -13,16 +13,16 @@ namespace EmployeeAttendanceTracker.DAL.Data.Entities
 
         [Required]
         [StringLength(50, MinimumLength = 3)]
-        public string DepartmentName { get; set;}
+        public string DepartmentName { get; set; } = string.Empty;
 
         [Required]
         [RegularExpression(@"^[A-Z]{4}$")]
-        public string DepartmentCode { get; set; }
+        public string DepartmentCode { get; set; } = string.Empty;
 
         [Required]
         [StringLength(100)]
-        public string Location { get; set; }
+        public string Location { get; set; } = string.Empty;
 
-        public ICollection<Employee> Employees { get; set; } //1 to M relationShip
+        public ICollection<Employee>? Employees { get; set; } //1 to M relationShip
     }
 }

@@ -51,6 +51,24 @@ namespace EmployeeAttendanceTracker.DAL.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<bool> IsEmailUniqueAsync(string email, int? excludeEmployeeId = null)
+        {
+            return !await _context.Employees
+                .AnyAsync(e => e.Email == email && (!excludeEmployeeId.HasValue || e.EmployeeId != excludeEmployeeId.Value));
+        }
+
+        //to generate next employee code
+        public async Task<int> GenerateUniqueEmployeeCodeAsync()
+        {
+            int code;
+            do
+            {
+                code = new Random().Next(1000, 9999);
+            } while (await _context.Employees.AnyAsync(e => e.EmployeeCode == code));
+            return code;
+        }
+
+
 
     }
 }

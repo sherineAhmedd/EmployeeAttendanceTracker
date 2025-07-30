@@ -14,6 +14,10 @@ namespace EmployeeAttendanceTracker.DAL.Interfaces
         Task AddAsync(Employee employee);
         Task UpdateAsync(Employee employee);
         Task DeleteAsync(int id);
+        Task<bool> IsEmailUniqueAsync(string email, int? excludeEmployeeId = null);
+        Task<int> GenerateUniqueEmployeeCodeAsync();
+
+
 
     }
 }

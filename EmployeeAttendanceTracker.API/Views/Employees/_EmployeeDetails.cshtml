@@ -1,0 +1,22 @@
+@model EmployeeAttendanceTracker.DAL.Data.Entities.Employee
+
+<div class="card">
+    <div class="card-header">
+        <h5>Employee Details</h5>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-4">Employee Code:</dt>
+            <dd class="col-sm-8">@Model.EmployeeCode</dd>
+            
+            <dt class="col-sm-4">Full Name:</dt>
+            <dd class="col-sm-8">@Model.FullName</dd>
+            
+            <dt class="col-sm-4">Email:</dt>
+            <dd class="col-sm-8">@Model.Email</dd>
+            
+            <dt class="col-sm-4">Department:</dt>
+            <dd class="col-sm-8">@Model.Department?.DepartmentName</dd>
+        </dl>
+    </div>
+</div> 

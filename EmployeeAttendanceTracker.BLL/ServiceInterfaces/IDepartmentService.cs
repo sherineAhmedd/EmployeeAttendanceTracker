@@ -11,9 +11,12 @@ namespace EmployeeAttendanceTracker.BLL.ServiceInterfaces
     public interface IDepartmentService
     {
         Task<IEnumerable<DepartmentDto>> GetAllDepartmentsAsync();
-        Task<Department> GetDepartmentByIdAsync(int id);
-        Task AddDepartmentAsync(Department department);
-        Task UpdateDepartmentAsync(Department department);
+        Task<DepartmentDto?> GetDepartmentByIdAsync(int id);
+        Task AddDepartmentAsync(CreateDepartmentDto dto);
+
+        Task<DepartmentDto?> GetDepartmentDtoByIdAsync(int id);
+
+        Task UpdateDepartmentAsync(DepartmentDto dto);
         Task DeleteDepartmentAsync(int id);
 
 

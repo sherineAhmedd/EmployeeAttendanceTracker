@@ -13,15 +13,15 @@ public class DepartmentDto
 
     [Required]
     [StringLength(50, MinimumLength = 3)]
-    public string DepartmentName { get; set; }
+    public string? DepartmentName { get; set; }
 
     [Required]
     [RegularExpression(@"^[A-Z]{4}$")]
-    public string DepartmentCode { get; set; }
+    public string? DepartmentCode { get; set; }
 
     [Required]
     [StringLength(100)]
-    public string Location { get; set; }
+    public string? Location { get; set; }
 
     public int? EmpCount { get; set; }
 }

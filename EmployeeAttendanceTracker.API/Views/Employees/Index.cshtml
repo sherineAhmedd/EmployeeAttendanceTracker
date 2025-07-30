@@ -1,0 +1,99 @@
+﻿@model IEnumerable<EmployeeAttendanceTracker.BLL.DTOs.EmployeeDto>
+
+@{
+    ViewData["Title"] = "Index";
+    var pageSize = 5; // Items per page
+    var totalItems = Model.Count();
+    var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+    var currentPage = Context.Request.Query["page"].ToString();
+    if (string.IsNullOrEmpty(currentPage)) currentPage = "1";
+    var currentPageNum = int.Parse(currentPage);
+    var skip = (currentPageNum - 1) * pageSize;
+    var employees = Model.Skip(skip).Take(pageSize);
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                Department
+            </th>
+            <th>
+                Current Month Attendance
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in employees) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FullName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DepartmentName)
+            </td>
+                <td>
+                    <span class="badge badge-success text-dark">Present: @item.PresentCount</span>
+                    <span class="badge badge-danger text-dark">Absent: @item.AbsentCount</span>
+                    <span class="badge badge-info text-dark">Percentage: @item.AttendancePercentage%</span>
+                </td>
+
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.EmployeeId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.EmployeeId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.EmployeeId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<!-- Pagination -->
+@if (totalPages > 1)
+{
+    <nav aria-label="Employee pagination">
+        <ul class="pagination justify-content-center">
+            @if (currentPageNum > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="?page=@(currentPageNum - 1)">Previous</a>
+                </li>
+            }
+            
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == currentPageNum ? "active" : "")">
+                    <a class="page-link" href="?page=@i">@i</a>
+                </li>
+            }
+            
+            @if (currentPageNum < totalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="?page=@(currentPageNum + 1)">Next</a>
+                </li>
+            }
+        </ul>
+    </nav>
+    
+    <div class="text-center">
+        <small class="text-muted">
+            Showing @(skip + 1) to @(Math.Min(skip + pageSize, totalItems)) of @totalItems employees
+        </small>
+    </div>
+}

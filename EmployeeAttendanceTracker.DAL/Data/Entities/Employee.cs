@@ -13,20 +13,22 @@ namespace EmployeeAttendanceTracker.DAL.Data.Entities
 
         [Required]
         [RegularExpression(@"^([A-Za-z]{2,}\s){3}[A-Za-z]{2,}$")]
-        public string FullName { get; set; }
-        public int EmployeeCode { get; set; }
+        public string FullName { get; set; } = string.Empty;
+
+        [Required]
+        public int EmployeeCode { get; set; } //System-generated
 
 
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
 
         [Required]
         public int DepartmentId { get; set; }  //Fk
-        public Department Department { get; set; }
+        public Department? Department { get; set; }
 
 
-
+        public ICollection<Attendance>? Attendances { get; set; }
 
 
 

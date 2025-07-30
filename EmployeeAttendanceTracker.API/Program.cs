@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Builder; // Required for WebApplication
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using EmployeeAttendanceTracker.DAL.Data.Entities;
+using EmployeeAttendanceTracker.DAL.Seeding;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,48 +20,18 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IAttendanceRepository, AttendanceRepository>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
-//builder.Services.AddScoped<>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 
 var app = builder.Build();
 
-
-// ✅ SEED DEPARTMENT DATA HERE
+// Seed the database
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-    if (!dbContext.Departments.Any())
-    {
-        dbContext.Departments.AddRange(
-            new Department { DepartmentName = "HR", DepartmentCode = "HRXX", Location = "Cairo" },
-            new Department { DepartmentName = "IT", DepartmentCode = "ITTT", Location = "Alexandria" },
-            new Department { DepartmentName = "Finance", DepartmentCode = "FINA", Location = "Giza" }
-        );
-        dbContext.Employees.AddRange(
-            new Employee
-            {
-                FullName = "Shereen Ahmed Ahmed Ahmed",
-                DepartmentId = 1,
-                Email = "ShereenAhmed@gmail.com"
-            },
-
-            new Employee
-            {
-                FullName = "Farah Ahmed Ahmed Ahmed",
-                DepartmentId = 1,
-                Email = "FarahAhmed@gmail.com"
-            },
-            new Employee
-            {
-                FullName = " Ahmed Ahmed Ahmed",
-                DepartmentId = 2,
-                Email = "Ahmed@gmail.com"
-            }
-            );
-
-        dbContext.SaveChanges();
-    }
+    await AppDbInitializer.SeedAsync(dbContext);
 }
 
 

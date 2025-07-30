@@ -5,23 +5,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EmployeeAttendanceTracker.BLL.DTOs;
-
-public class CreateDepartmentDto
+namespace EmployeeAttendanceTracker.BLL.DTOs
 {
-    public int DepartmentId { get; set; }
+    public class CreateDepartmentDto
+    {
+        public int? DepartmentId { get; set; } // Nullable for Add/Edit
 
-    [Required]
-    [StringLength(50, MinimumLength = 3)]
-    public string DepartmentName { get; set; }
+        [Required]
+        [StringLength(50, MinimumLength = 3)]
+        public string? DepartmentName { get; set; }
 
-    [Required]
-    [RegularExpression(@"^[A-Z]{4}$")]
-    public string DepartmentCode { get; set; }
+        [Required]
+        [RegularExpression(@"^[A-Z]{4}$", ErrorMessage = "Department Code must be exactly 4 uppercase letters")]
+        public string? DepartmentCode { get; set; }
 
-    [Required]
-    [StringLength(100)]
-    public string Location { get; set; }
-
-    public int? EmpCount { get; set; }
+        [Required]
+        [StringLength(100)]
+        public string? Location { get; set; }
+    }
 }
