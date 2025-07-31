@@ -134,27 +134,19 @@ namespace EmployeeAttendanceTracker.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetForDropdown()
         {
-            var employees = await _employeeService.GetAllEmployeesAsync();
-            var dropdownData = employees.Select(e => new { 
-                employeeId = e.EmployeeId, 
-                fullName = e.FullName 
-            });
+            var dropdownData = await _employeeService.GetEmployeeDropdownAsync();
             return Json(dropdownData);
         }
 
 
-        //helper method 
-        // Utility method for dropdown population
+     
         private async Task PopulateDepartmentsDropdownAsync(int? selectedDepartmentId = null)
         {
             var departments = await _departmentService.GetAllDepartmentsAsync();
             ViewData["DepartmentId"] = new SelectList(departments, "DepartmentId", "DepartmentName", selectedDepartmentId);
         }
 
-        private async Task<bool> EmployeeExistsAsync(int id)
-        {
-            return await _employeeService.EmployeeExistsAsync(id);
-        }
+      
     }
 
     }

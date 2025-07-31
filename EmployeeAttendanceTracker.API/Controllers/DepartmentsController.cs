@@ -1,16 +1,7 @@
 ﻿using EmployeeAttendanceTracker.BLL.DTOs;
 using EmployeeAttendanceTracker.BLL.ServiceInterfaces;
-using EmployeeAttendanceTracker.BLL.Services;
-using EmployeeAttendanceTracker.DAL.Context;
-using EmployeeAttendanceTracker.DAL.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace EmployeeAttendanceTracker.API.Controllers
 {
@@ -30,7 +21,6 @@ namespace EmployeeAttendanceTracker.API.Controllers
             return View(departments);
         }
 
-        // GET: Departments/Details/5
         public async Task<IActionResult> Details(int id)
         {
             var department = await _departmentService.GetDepartmentByIdAsync(id);
@@ -38,7 +28,6 @@ namespace EmployeeAttendanceTracker.API.Controllers
         }
 
 
-        // GET: Departments/Create
         public IActionResult Create()
         {
             return View(new CreateDepartmentDto());
@@ -54,7 +43,7 @@ namespace EmployeeAttendanceTracker.API.Controllers
 
             try
             {
-                // Pass the DTO directly; the service handles mapping, validation, and saving
+                // Pass the DTO directly; the service handles mapping, validation, and savingg
                 await _departmentService.AddDepartmentAsync(dto);
                 return RedirectToAction(nameof(Index));
             }
@@ -108,7 +97,6 @@ namespace EmployeeAttendanceTracker.API.Controllers
 
 
 
-        // GET: Departments/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -132,11 +120,7 @@ namespace EmployeeAttendanceTracker.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetForDropdown()
         {
-            var departments = await _departmentService.GetAllDepartmentsAsync();
-            var dropdownData = departments.Select(d => new { 
-                departmentId = d.DepartmentId, 
-                departmentName = d.DepartmentName 
-            });
+            var dropdownData = await _departmentService.GetDepartmentDropdownAsync();
             return Json(dropdownData);
         }
     }

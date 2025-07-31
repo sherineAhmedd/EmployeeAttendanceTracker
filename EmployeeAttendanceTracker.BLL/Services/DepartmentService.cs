@@ -23,7 +23,6 @@ namespace EmployeeAttendanceTracker.BLL.Services
 
         public async Task<IEnumerable<DepartmentDto>> GetAllDepartmentsAsync()
         {
-            //return await _departmentRepository.GetAllAsync();
             var departments = await _departmentRepository.GetAllAsync();
 
             return departments.Select(d => new DepartmentDto
@@ -58,14 +57,18 @@ namespace EmployeeAttendanceTracker.BLL.Services
 
         public async Task AddDepartmentAsync(CreateDepartmentDto dto)
         {
-            // Use dto for validation
+            ValidateDepartmentName(dto.DepartmentName);
+
+            ValidateDepartmentCode(dto.DepartmentCode);
+
+            ValidateLocation(dto.Location);
+
             if (!await _departmentRepository.IsNameUniqueAsync(dto.DepartmentName))
                 throw new Exception("Department name must be unique.");
 
             if (!await _departmentRepository.IsCodeUniqueAsync(dto.DepartmentCode))
                 throw new Exception("Department code must be unique.");
 
-            // Map dto to entity
             var department = new Department
             {
                 DepartmentName = dto.DepartmentName,
@@ -91,21 +94,24 @@ namespace EmployeeAttendanceTracker.BLL.Services
             };
         }
 
-
         public async Task UpdateDepartmentAsync(DepartmentDto dto)
         {
+            ValidateDepartmentName(dto.DepartmentName);
+
+            ValidateDepartmentCode(dto.DepartmentCode);
+
+            ValidateLocation(dto.Location);
+
             var existingDepartment = await _departmentRepository.GetByIdAsync(dto.DepartmentId);
             if (existingDepartment == null)
                 throw new Exception("Department not found.");
 
-            // Business validation
             if (!await _departmentRepository.IsNameUniqueAsync(dto.DepartmentName, dto.DepartmentId))
                 throw new ValidationException("Department name must be unique.");
 
             if (!await _departmentRepository.IsCodeUniqueAsync(dto.DepartmentCode, dto.DepartmentId))
                 throw new ValidationException("Department code must be unique.");
 
-            // Update fields
             existingDepartment.DepartmentName = dto.DepartmentName;
             existingDepartment.DepartmentCode = dto.DepartmentCode;
             existingDepartment.Location = dto.Location;
@@ -114,21 +120,54 @@ namespace EmployeeAttendanceTracker.BLL.Services
             await _departmentRepository.SaveChangesAsync();
         }
 
+        private void ValidateDepartmentName(string departmentName)
+        {
+            if (string.IsNullOrWhiteSpace(departmentName))
+                throw new Exception("Department name is required.");
+
+            if (departmentName.Length < 3)
+                throw new Exception("Department name must be at least 3 characters long.");
+
+            if (departmentName.Length > 50)
+                throw new Exception("Department name cannot exceed 50 characters.");
+        }
+
+        private void ValidateDepartmentCode(string departmentCode)
+        {
+            if (string.IsNullOrWhiteSpace(departmentCode))
+                throw new Exception("Department code is required.");
+
+            if (departmentCode.Length != 4)
+                throw new Exception("Department code must be exactly 4 characters long.");
+
+            if (!departmentCode.All(char.IsUpper))
+                throw new Exception("Department code must be in uppercase.");
+
+            if (!departmentCode.All(char.IsLetter))
+                throw new Exception("Department code must contain only alphabetic characters.");
+        }
+
+        private void ValidateLocation(string location)
+        {
+            if (string.IsNullOrWhiteSpace(location))
+                throw new Exception("Location is required.");
+
+            if (location.Length > 100)
+                throw new Exception("Location cannot exceed 100 characters.");
+        }
 
         public async Task DeleteDepartmentAsync(int id)
         {
             await _departmentRepository.DeleteAsync(id);
         }
 
-        //public async Task<IEnumerable<DepartmentDropdownDto>> GetForDropdownAsync()
-        //{
-        //    var departments = await _departmentRepository.GetForDropdownAsync();
-
-        //    return departments.Select(d => new DepartmentDropdownDto
-        //    {
-        //        DepartmentId = d.DepartmentId,
-        //        DepartmentName = d.DepartmentName
-        //    });
-        //}
+        public async Task<IEnumerable<object>> GetDepartmentDropdownAsync()
+        {
+            var departments = await _departmentRepository.GetAllAsync();
+            return departments.Select(d => new {
+                departmentId = d.DepartmentId,
+                departmentName = d.DepartmentName
+            }).ToList();
+        }
     }
 }

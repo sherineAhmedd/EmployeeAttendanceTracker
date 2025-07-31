@@ -1,70 +1,71 @@
 # Employee Attendance Tracker
 
-A comprehensive Employee Attendance Management System built with ASP.NET MVC, Entity Framework Core, and In-Memory Database.
+A comprehensive Employee Attendance Management System built with ASP.NET MVC, Entity Framework Core, and an in-memory database.
 
 ## 🏗️ Architecture
 
-This project follows **N-Tier Architecture**:
+This project follows **N-Tier Architecture** principles:
 
-- **Presentation Layer**: ASP.NET MVC (Views and Controllers)
-- **Business Layer**: Services (All business logic and validation)
-- **Data Layer**: Entity Framework Core with In-Memory Database
+### **Presentation Layer**
+- **ASP.NET MVC**: Views and Controllers
+- **Controllers**: Handle HTTP requests/responses only
+- **Views**: Razor views with jQuery for dynamic interactions
+
+### **Business Layer**
+- **Services**: All business logic and validation
+- **Interfaces**: IAttendanceService, IEmployeeService, IDepartmentService
+- **DTOs**: Data Transfer Objects for clean data flow
+
+### **Data Layer**
+- **Entity Framework Core**: Code-First approach
+- **In-Memory Database**: For development and testing
+- **Repositories**: Data access abstraction
 
 ## 🚀 Features
 
-### 1. Department Management
+### **Department Management**
 - ✅ Add, edit, delete, and list departments
-- ✅ Department validation (Name: 3-50 chars, Code: 4 uppercase letters)
-- ✅ Prevent duplicate department names and codes
+- ✅ Validation: Name (3-50 chars, unique), Code (4 uppercase letters, unique), Location (max 100 chars)
 - ✅ Display employee count per department
 
-### 2. Employee Management
+### **Employee Management**
 - ✅ Add, edit, delete, and list employees
-- ✅ Employee validation (4 names, unique email, department selection)
-- ✅ System-generated unique employee codes
-- ✅ Display current month's attendance summary
-- ✅ Pagination support
+- ✅ Employee Code: Auto-generated, unique, non-editable
+- ✅ Full Name: Four names, each ≥2 characters, letters/spaces only
+- ✅ Email: Required, unique, valid format
+- ✅ Department: Dropdown selection
+- ✅ Current month attendance summary with percentage
 
-### 3. Attendance Management
+### **Attendance Management**
 - ✅ Record attendance (Present/Absent) for specific dates
-- ✅ Prevent duplicate attendance per employee per day
-- ✅ Prevent future date attendance marking
+- ✅ One attendance per employee per day
+- ✅ No future date attendance
 - ✅ Edit and delete attendance records
 - ✅ Filter by department, employee, or date range
-- ✅ Live filtering with jQuery
 
-### 4. Dynamic UI Features
-- ✅ Calendar widget for date selection
-- ✅ Real-time attendance status updates
-- ✅ Future date prevention in calendar
+### **Dynamic UI Features**
+- ✅ Interactive calendar widget for date selection
 - ✅ Live status updates without page reload
-- ✅ Quick attendance entry form
+- ✅ Future dates disabled in calendar
+- ✅ Color-coded status (green for Present, red for Absent)
+- ✅ jQuery-powered dynamic interactions
 
-### 5. Bonus Features
-- ✅ Pagination for employee list
-- ✅ Live filtering for attendance list
-- ✅ Partial views for employee details and attendance history
-- ✅ Responsive Bootstrap UI
+### **Bonus Features**
+- ✅ Pagination for employee and attendance lists
+- ✅ Live filtering with jQuery
+- ✅ Partial views for attendance history
+- ✅ Modern, responsive UI design
 
-## 🛠️ Technical Stack
+## 🛠️ Setup Instructions
 
-- **Framework**: ASP.NET Core MVC 8.0
-- **Database**: Entity Framework Core In-Memory Database
-- **Frontend**: Bootstrap 5, jQuery
-- **Architecture**: N-Tier with Dependency Injection
-- **Validation**: Data Annotations and Custom Business Rules
-
-## 📋 Prerequisites
-
-- .NET 8.0 SDK
+### **Prerequisites**
+- .NET 6.0 or later
 - Visual Studio 2022 or VS Code
-- Any modern web browser
 
-## 🚀 Setup Instructions
-
+### **Installation**
 1. **Clone the repository**
    ```bash
-   git clone [repository-url]
+   git clone [your-repository-url]
    cd EmployeeAttendanceTracker.API
    ```
 
@@ -73,154 +74,97 @@ This project follows **N-Tier Architecture**:
    dotnet restore
    ```
 
-3. **Build the solution**
-   ```bash
-   dotnet build
-   ```
-
-4. **Run the application**
+3. **Run the application**
    ```bash
    dotnet run
    ```
 
-5. **Access the application**
-   - Open your browser and navigate to `https://localhost:5001` or `http://localhost:5000`
+4. **Access the application**
+   - Open browser and navigate to `https://localhost:7000` or `http://localhost:5000`
    - The application will automatically seed sample data
 
-## 📊 Sample Data
+### **Database**
+- **Type**: In-Memory Database (Entity Framework Core)
+- **Seeding**: Automatic sample data on startup
+- **Sample Data**: 5 departments, 10 employees, 20 attendance records
 
-The application comes with pre-seeded data:
-- **Departments**: SWE, ITI, Finance
-- **Employees**: 3 sample employees with different departments
-- **Attendance**: Sample attendance records
-
-## 🏛️ Project Structure
+## 📁 Project Structure
 
 ```
 EmployeeAttendanceTracker.API/
-├── EmployeeAttendanceTracker.API/          # Presentation Layer
-│   ├── Controllers/                        # MVC Controllers
-│   ├── Views/                             # Razor Views
-│   └── wwwroot/                           # Static Files
-├── EmployeeAttendanceTracker.BLL/          # Business Layer
-│   ├── DTOs/                              # Data Transfer Objects
-│   ├── Services/                          # Business Logic Services
-│   ├── ServiceInterfaces/                 # Service Contracts
-│   └── Enums/                             # Enumerations
-└── EmployeeAttendanceTracker.DAL/          # Data Layer
-    ├── Context/                           # DbContext
-    ├── Data/Entities/                     # Entity Models
-    ├── Interfaces/                        # Repository Contracts
-    ├── Repositories/                      # Data Access Implementation
-    └── Seeding/                           # Database Seeding
+├── Controllers/          # MVC Controllers (HTTP handling only)
+├── Views/               # Razor Views
+├── wwwroot/             # Static files (CSS, JS, images)
+├── Models/              # View Models
+└── Program.cs           # Application startup and DI configuration
+
+EmployeeAttendanceTracker.BLL/
+├── Services/            # Business logic implementation
+├── ServiceInterfaces/   # Service contracts
+├── DTOs/               # Data Transfer Objects
+└── Enums/              # Enumerations
+
+EmployeeAttendanceTracker.DAL/
+├── Context/            # Entity Framework DbContext
+├── Data/Entities/      # Entity models
+├── Interfaces/         # Repository contracts
+├── Repositories/       # Data access implementation
+└── Seeding/           # Database seeding logic
 ```
 
-## 🔧 Key Components
+## 🎯 Key Features
 
-### Controllers
-- `DepartmentsController` - Department CRUD operations
-- `EmployeesController` - Employee CRUD operations  
-- `AttendancesController` - Attendance management with AJAX support
+### **Home Dashboard**
+- Navigation cards for quick access to all modules
+- Quick action buttons for common tasks
 
-### Services
-- `DepartmentService` - Department business logic
-- `EmployeeService` - Employee business logic with attendance summary
-- `AttendanceService` - Attendance business logic and validation
+### **Quick Attendance Entry**
+- Real-time status checking
+- Interactive calendar widget
+- Color-coded status indicators
 
-### Repositories
-- `DepartmentRepository` - Department data access
-- `EmployeeRepository` - Employee data access with unique code generation
-- `AttendanceRepository` - Attendance data access with filtering
+### **Advanced Filtering**
+- Live filtering with jQuery
+- Date range selection
+- Department and employee filters
 
-## 🎯 Business Rules
+### **Responsive Design**
+- Bootstrap-based UI
+- Mobile-friendly interface
+- Modern animations and transitions
 
-### Department Validation
-- Name: Required, 3-50 characters, unique
-- Code: Required, exactly 4 uppercase letters, unique
-- Location: Required, max 100 characters
+## 🔧 Technical Implementation
 
-### Employee Validation
-- Full Name: Required, exactly 4 names, each 2+ characters
-- Email: Required, valid format, unique
-- Department: Required, must exist
-- Employee Code: Auto-generated, unique
+### **Validation Rules**
+- All validation implemented in service layer
+- No business logic in controllers
+- Comprehensive error handling
 
-### Attendance Validation
-- One attendance per employee per day
-- Cannot mark attendance for future dates
-- Status must be Present or Absent
-
-## 🎨 UI/UX Features
-
-- **Responsive Design**: Bootstrap 5 for mobile-friendly interface
-- **Dynamic Updates**: jQuery for real-time status updates
-- **Live Filtering**: Instant filtering without page reload
-- **Calendar Integration**: Date picker with future date prevention
-- **Pagination**: Efficient data display for large datasets
-
-## 🔒 Security Features
-
-- CSRF protection on all forms
+### **Security**
+- Anti-forgery tokens for forms
 - Input validation and sanitization
-- Business rule enforcement in service layer
-- Dependency injection for loose coupling
+- Proper model binding
 
-## 🧪 Testing
+### **Performance**
+- Efficient database queries
+- Pagination for large datasets
+- Optimized AJAX calls
 
-The application is designed with testability in mind:
-- Service layer separation for unit testing
-- Interface-based design for mocking
-- Dependency injection for test isolation
+## 📝 Development Notes
 
-## 📝 API Endpoints
-
-### Departments
-- `GET /Departments` - List departments
-- `GET /Departments/Create` - Create form
-- `POST /Departments/Create` - Create department
-- `GET /Departments/Edit/{id}` - Edit form
-- `POST /Departments/Edit/{id}` - Update department
-- `GET /Departments/Delete/{id}` - Delete confirmation
-- `POST /Departments/Delete/{id}` - Delete department
-- `GET /Departments/GetForDropdown` - AJAX dropdown data
-
-### Employees
-- `GET /Employees` - List employees (with pagination)
-- `GET /Employees/Create` - Create form
-- `POST /Employees/Create` - Create employee
-- `GET /Employees/Edit/{id}` - Edit form
-- `POST /Employees/Edit/{id}` - Update employee
-- `GET /Employees/Delete/{id}` - Delete confirmation
-- `POST /Employees/Delete/{id}` - Delete employee
-- `GET /Employees/GetForDropdown` - AJAX dropdown data
-
-### Attendances
-- `GET /Attendances` - List attendances (with filtering)
-- `GET /Attendances/Create` - Create form
-- `POST /Attendances/Create` - Create attendance
-- `POST /Attendances/CreateAjax` - AJAX create attendance
-- `GET /Attendances/GetStatus` - Get attendance status
-- `GET /Attendances/Edit/{id}` - Edit form
-- `POST /Attendances/Edit/{id}` - Update attendance
-- `GET /Attendances/Delete/{id}` - Delete confirmation
-- `POST /Attendances/Delete/{id}` - Delete attendance
+- **Architecture**: Strict N-Tier separation
+- **Testing**: Ready for unit testing implementation
+- **Scalability**: Easy to switch to SQL Server or other databases
+- **Maintainability**: Clean code with proper separation of concerns
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+This project follows clean coding practices and n-tier architecture principles. All business logic must be implemented in the service layer.
 
-## 📄 License
+## 📧 Contact
 
-This project is created for CodeZone LLC task submission.
-
-## 📞 Contact
-
-For any inquiries, please contact: career@codezone-eg.com
+For any inquiries about this project, please contact the development team.
 
 ---
 
-**Developed with ❤️ using ASP.NET Core MVC**
+**Built with ❤️ using ASP.NET Core MVC and Entity Framework Core**

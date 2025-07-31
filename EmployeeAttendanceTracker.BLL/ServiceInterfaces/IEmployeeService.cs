@@ -18,8 +18,8 @@ namespace EmployeeAttendanceTracker.BLL.ServiceInterfaces
         Task UpdateEmployeeAsync(EmployeeDto dto);
         Task DeleteEmployeeAsync(int id);
         Task<Employee> GetEmployeeWithDepartmentByIdAsync(int id);
+        Task<IEnumerable<object>> GetEmployeeDropdownAsync();
 
-        Task<bool> EmployeeExistsAsync(int id);
 
 
 

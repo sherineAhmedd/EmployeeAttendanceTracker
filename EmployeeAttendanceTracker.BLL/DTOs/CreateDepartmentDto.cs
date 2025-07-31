@@ -9,7 +9,7 @@ namespace EmployeeAttendanceTracker.BLL.DTOs
 {
     public class CreateDepartmentDto
     {
-        public int? DepartmentId { get; set; } // Nullable for Add/Edit
+        public int? DepartmentId { get; set; } 
 
         [Required]
         [StringLength(50, MinimumLength = 3)]

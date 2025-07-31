@@ -18,6 +18,7 @@ namespace EmployeeAttendanceTracker.BLL.ServiceInterfaces
 
         Task UpdateDepartmentAsync(DepartmentDto dto);
         Task DeleteDepartmentAsync(int id);
+        Task<IEnumerable<object>> GetDepartmentDropdownAsync();
 
 
     }

@@ -25,11 +25,9 @@ namespace EmployeeAttendanceTracker.DAL.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            //Data seeding
-            modelBuilder.Entity<Department>().HasData(
-           new Department { DepartmentId = 1, DepartmentName = "HR", DepartmentCode = "HRMG", Location = "Cairo" },
-           new Department { DepartmentId = 2, DepartmentName = "Tech", DepartmentCode = "TECH", Location = "Alexandria" }
-       );
+            
+           
+    
 
             // department entity
             modelBuilder.Entity<Department>()

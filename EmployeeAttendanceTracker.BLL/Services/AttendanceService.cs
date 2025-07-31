@@ -24,7 +24,6 @@ namespace EmployeeAttendanceTracker.BLL.Services
             var entity = await _attendanceRepository.GetByIdAsync(id);
             if (entity == null) return null;
 
-            // Get employee information for the attendance record
             var attendanceWithEmployee = await _attendanceRepository.GetAttendanceWithEmployeeAsync(id);
             if (attendanceWithEmployee == null) return null;
 
@@ -34,6 +33,7 @@ namespace EmployeeAttendanceTracker.BLL.Services
                 EmployeeId = attendanceWithEmployee.EmployeeId,
                 EmployeeName = attendanceWithEmployee.Employee?.FullName,
                 DepartmentName = attendanceWithEmployee.Employee?.Department?.DepartmentName,
+                EmployeeCode = attendanceWithEmployee.Employee?.EmployeeCode,
                 Date = attendanceWithEmployee.Date,
                 Status = Enum.Parse<AttendanceStatus>(attendanceWithEmployee.Status)
             };
@@ -87,6 +87,19 @@ namespace EmployeeAttendanceTracker.BLL.Services
             await _attendanceRepository.UpdateAsync(existing);
         }
 
+        public async Task UpdateAttendanceStatusAsync(int attendanceId, AttendanceStatus status)
+        {
+            var existing = await _attendanceRepository.GetByIdAsync(attendanceId);
+            if (existing == null)
+                throw new Exception("Attendance record not found.");
+
+            if (existing.Date.Date > DateTime.Today)
+                throw new Exception("Cannot update attendance for future dates.");
+
+            existing.Status = status.ToString();
+            await _attendanceRepository.UpdateAsync(existing);
+        }
+
         public async Task DeleteAttendanceAsync(int id)
         {
             await _attendanceRepository.DeleteAsync(id);
@@ -101,6 +114,7 @@ namespace EmployeeAttendanceTracker.BLL.Services
                 EmployeeId = a.EmployeeId,
                 EmployeeName = a.Employee.FullName,
                 DepartmentName = a.Employee.Department?.DepartmentName,
+                EmployeeCode = a.Employee.EmployeeCode,
                 Date = a.Date,
                 Status = Enum.Parse<AttendanceStatus>(a.Status)
             }).ToList();

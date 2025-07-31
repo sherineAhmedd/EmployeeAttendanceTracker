@@ -23,7 +23,8 @@ namespace EmployeeAttendanceTracker.BLL.DTOs
         public AttendanceStatus Status { get; set; }
 
 
-        public string? EmployeeName { get; set; } // for display only
-        public string? DepartmentName { get; set; } // for display only
+        public string? EmployeeName { get; set; } 
+        public string? DepartmentName { get; set; } 
+        public int? EmployeeCode { get; set; } 
     }
 }

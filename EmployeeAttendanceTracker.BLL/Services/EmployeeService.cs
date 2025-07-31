@@ -62,15 +62,17 @@ namespace EmployeeAttendanceTracker.BLL.Services
 
         public async Task AddEmployeeAsync(CreateEmployeeDto dto)
         {
-            // Validate Email Uniqueness
+            
+            ValidateFullName(dto.FullName);
+
+            ValidateEmailFormat(dto.Email);
+
             var isUnique = await _employeeRepository.IsEmailUniqueAsync(dto.Email);
             if (!isUnique)
                 throw new Exception("Email already exists.");
 
-            // Generate Employee Code
             var employeeCode = await _employeeRepository.GenerateUniqueEmployeeCodeAsync();
 
-            // Map DTO to Entity
             var employee = new Employee
             {
                 FullName = dto.FullName,
@@ -85,18 +87,18 @@ namespace EmployeeAttendanceTracker.BLL.Services
 
         public async Task UpdateEmployeeAsync(EmployeeDto dto)
         {
-           
+          
+            ValidateFullName(dto.FullName);
 
-            var existing = await _employeeRepository.GetByIdAsync(dto.EmployeeId); // Use .Value to convert nullable int to int
+            ValidateEmailFormat(dto.Email);
+
+            var existing = await _employeeRepository.GetByIdAsync(dto.EmployeeId); 
             if (existing == null)
                 throw new Exception("Employee not found.");
 
-            // Validate email uniqueness
             var isUnique = await _employeeRepository.IsEmailUniqueAsync(dto.Email, existing.EmployeeId);
             if (!isUnique)
                 throw new Exception("Email already exists.");
-
-            // Update fields
             existing.FullName = dto.FullName;
             existing.Email = dto.Email;
             existing.DepartmentId = dto.DepartmentId;
@@ -108,7 +110,6 @@ namespace EmployeeAttendanceTracker.BLL.Services
             var employee = await _employeeRepository.GetByIdAsync(id);
             if (employee == null) return null;
 
-            // Calculate attendance summary for current month
             var currentMonth = DateTime.Now.Month;
             var currentYear = DateTime.Now.Year;
             var attendanceSummary = await CalculateAttendanceSummaryAsync(employee.EmployeeId, currentMonth, currentYear);
@@ -129,7 +130,7 @@ namespace EmployeeAttendanceTracker.BLL.Services
 
         private async Task<(int PresentCount, int AbsentCount, double AttendancePercentage)> CalculateAttendanceSummaryAsync(int employeeId, int month, int year)
         {
-            // Get all attendance records for the employee in the specified month and year
+           
             var startDate = new DateTime(year, month, 1);
             var endDate = startDate.AddMonths(1).AddDays(-1);
             
@@ -154,12 +155,56 @@ namespace EmployeeAttendanceTracker.BLL.Services
            return  await _employeeRepository.GetByIdAsync(id);
 
         }
+        public async Task<IEnumerable<object>> GetEmployeeDropdownAsync()
+        {
+            var employees = await _employeeRepository.GetAllAsync();
+            return employees.Select(e => new {
+                employeeId = e.EmployeeId,
+                fullName = e.FullName
+            }).ToList();
+        }
        
 
         public async Task<bool> EmployeeExistsAsync(int id)
         {
             var employee = await _employeeRepository.GetByIdAsync(id);
             return employee != null;
+        }
+
+        private void ValidateFullName(string fullName)
+        {
+            if (string.IsNullOrWhiteSpace(fullName))
+                throw new Exception("Full name is required.");
+
+            var names = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (names.Length != 4)
+                throw new Exception("Full name must contain exactly four names.");
+
+            foreach (var name in names)
+            {
+                if (name.Length < 2)
+                    throw new Exception("Each name must be at least 2 characters long.");
+
+                if (!name.All(char.IsLetter))
+                    throw new Exception("Names can only contain letters.");
+            }
+        }
+
+        private void ValidateEmailFormat(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                throw new Exception("Email is required.");
+
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                if (addr.Address != email)
+                    throw new Exception("Invalid email format.");
+            }
+            catch
+            {
+                throw new Exception("Invalid email format.");
+            }
         }
 
 

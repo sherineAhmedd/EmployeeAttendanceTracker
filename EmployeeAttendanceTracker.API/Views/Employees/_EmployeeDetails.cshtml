@@ -1,22 +1,53 @@
-@model EmployeeAttendanceTracker.DAL.Data.Entities.Employee
+@model EmployeeAttendanceTracker.BLL.DTOs.EmployeeDto
 
 <div class="card">
     <div class="card-header">
-        <h5>Employee Details</h5>
+        <h6 class="mb-0">Employee Details</h6>
     </div>
     <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-4">Employee Code:</dt>
-            <dd class="col-sm-8">@Model.EmployeeCode</dd>
-            
-            <dt class="col-sm-4">Full Name:</dt>
-            <dd class="col-sm-8">@Model.FullName</dd>
-            
-            <dt class="col-sm-4">Email:</dt>
-            <dd class="col-sm-8">@Model.Email</dd>
-            
-            <dt class="col-sm-4">Department:</dt>
-            <dd class="col-sm-8">@Model.Department?.DepartmentName</dd>
-        </dl>
+        <div class="row">
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-4">Employee Code:</dt>
+                    <dd class="col-sm-8">@Model.EmployeeCode</dd>
+                    
+                    <dt class="col-sm-4">Full Name:</dt>
+                    <dd class="col-sm-8">@Model.FullName</dd>
+                    
+                    <dt class="col-sm-4">Email:</dt>
+                    <dd class="col-sm-8">@Model.Email</dd>
+                    
+                    <dt class="col-sm-4">Department:</dt>
+                    <dd class="col-sm-8">@Model.DepartmentName</dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h6 class="card-title">Current Month Attendance</h6>
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="text-success">
+                                    <h5>@Model.PresentCount</h5>
+                                    <small>Present</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-danger">
+                                    <h5>@Model.AbsentCount</h5>
+                                    <small>Absent</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-info">
+                                    <h5>@Model.AttendancePercentage%</h5>
+                                    <small>Percentage</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div> 

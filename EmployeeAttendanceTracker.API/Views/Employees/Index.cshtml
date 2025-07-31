@@ -12,14 +12,17 @@
     var employees = Model.Skip(skip).Take(pageSize);
 }
 
-<h1>Index</h1>
+<h1>Employees</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a class="btn btn-primary" asp-action="Create">Create New</a>
 </p>
 <table class="table">
     <thead>
         <tr>
+            <th>
+               Code
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.FullName)
             </th>
@@ -39,6 +42,9 @@
 @foreach (var item in employees) {
         <tr>
             <td>
+                @Html.DisplayFor(modelItem => item.EmployeeCode)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.FullName)
             </td>
             <td>
@@ -54,9 +60,9 @@
                 </td>
 
             <td>
-                <a asp-action="Edit" asp-route-id="@item.EmployeeId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.EmployeeId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.EmployeeId">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.EmployeeId"   class="btn btn-sm btn-warning">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.EmployeeId"class="btn btn-sm btn-info"   >Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.EmployeeId" class="btn btn-sm btn-danger" >Delete</a>
             </td>
         </tr>
 }
